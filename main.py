@@ -14,7 +14,7 @@ session_locks: dict[str, asyncio.Lock] = {}
 async def startup():
     global browser
     playwright = await async_playwright().start()
-    browser = await playwright.chromium.launch(headless=True)
+    browser = await playwright.chromium.launch(headless=True, chromium_sandbox=False)
 
 async def get_or_create_page(sid: str):
     lock = session_locks.setdefault(sid, asyncio.Lock())
