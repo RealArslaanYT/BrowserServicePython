@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>BrowserService</title>
+    <style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column; /* stack URL bar and page */
+        background: #000;
+    }
+
+    .urlbar-container {
+        display: flex;
+        padding: 5px 10px;
+        background: #222;
+        z-index: 1000;
+        height: 40px;
+    }
+
+    #urlBar {
+        flex: 1;
+        padding: 5px;
+        font-size: 16px;
+    }
+
+    #goBtn {
+        margin-left: 5px;
+        padding: 5px 10px;
+        font-size: 16px;
+    }
+
+    .pageview {
+        flex: 1; /* take remaining vertical space */
+        width: 100%;
+        object-fit: contain; /* maintain aspect ratio */
+        max-height: calc(100vh - 45px);
+    }
+    </style>
+</head>
+<body>
+    <div class="urlbar-container">
+        <input type="text" id="urlBar" placeholder="Enter URL">
+        <button id="goBtn">Go</button>
+    </div>
+
+    <img class="pageview"/>
+    <script defer>
+const sid = crypto.randomUUID();
+const protocol = location.protocol === "https:" ? "wss:" : "ws:";
+const socket = new WebSocket(`${protocol}//${location.host}/ws?sid=${sid}`);
+
+const img = document.querySelector(".pageview");
+
+img.src = `/live?sid=${sid}`;
+
+img.addEventListener("mousemove", e => {
+    const rect = img.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    sendMousePosition(x, y);
+});
+
+img.addEventListener("click", e => {
+    const rect = img.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    sendMouseClick(x, y);
+});
+
+document.addEventListener("keydown", e => {
+    if (document.activeElement === document.getElementById("urlBar")) return;
+    sendKeypress(e.key);
+});
+
+document.addEventListener('wheel', function(event) {
+    event.preventDefault();
+
+    const deltaX = event.deltaX;
+    const deltaY = event.deltaY;
+    const deltaMode = event.deltaMode;
+
+    console.log('Scroll Delta X:', deltaX);
+    console.log('Scroll Delta Y:', deltaY);
+
+    sendWheelEvent(deltaX, deltaY);
+});
+
+document.getElementById("goBtn").onclick = () => {
+    const url = document.getElementById("urlBar").value;
+    socket.send(JSON.stringify({ type: "navigate", url }));
+};
+
+document.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+        const url = document.getElementById("urlBar").value;
+        document.getElementById("urlBar").value = "";
+        socket.send(JSON.stringify({ type: "navigate", url }));
+    }
+});
+
+function sendMousePosition(x, y) {
+    const rect = img.getBoundingClientRect();
+    const imgWidth = rect.width;
+    const imgHeight = rect.height;
+
+    socket.send(JSON.stringify({
+        type: "mousemove",
+        x: x,
+        y: y,
+        img_width: imgWidth,
+        img_height: imgHeight
+    }));
+}
+
+function sendMouseClick(x, y) {
+    const rect = img.getBoundingClientRect();
+    const imgWidth = rect.width;
+    const imgHeight = rect.height;
+
+    socket.send(JSON.stringify({
+        type: "click",
+        x: x,
+        y: y,
+        img_width: imgWidth,
+        img_height: imgHeight
+    }));
+}
+
+function sendWheelEvent(deltaX, deltaY) {
+    socket.send(JSON.stringify({
+        type: "wheel",
+        deltaX: deltaX,
+        deltaY: deltaY
+    }));
+}
+
+function sendKeypress(key) {
+    socket.send(JSON.stringify({
+        type: "keypress",
+        key: key
+    }));
+}
+    </script>
+</body>
+</html>
