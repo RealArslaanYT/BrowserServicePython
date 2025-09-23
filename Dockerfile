@@ -14,6 +14,12 @@ RUN pip install -r requirements.txt
 
 # Set up a new user named "user" with user ID 1000
 RUN useradd -m -u 1000 user
+
+ENV PLAYWRIGHT_BROWSERS_PATH=/home/user/.cache/ms-playwright
+
+# Install playwright
+RUN playwright install --with-deps
+
 # Switch to the "user" user
 USER user
 # Set home to the user's home directory
@@ -25,9 +31,6 @@ ENV HOME=/home/user \
 	SYSTEM=spaces
 
 WORKDIR $HOME/app
-
-# Install playwright
-RUN playwright install --with-deps
 
 # Copy code
 COPY --chown=user . $HOME/app
