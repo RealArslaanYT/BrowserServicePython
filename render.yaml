@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: browservice-py
-    env: docker
-    plan: free
-    branch: main
-    healthCheckPath: /
