@@ -10,8 +10,9 @@ browser: Browser = None
 sessions: dict[str, Page] = {}
 session_locks: dict[str, asyncio.Lock] = {}
 
-FPS = 15  # VERY LOW so Render doesn't commit die when tryna run this
-LIVE_FEED_QUALITY = 35  # Also quite low (less than half!) to satisfy Render's bad VM
+WIDTH, HEIGHT = (640, 360)
+FPS = 10  # VERY LOW so Render doesn't commit die when tryna run this
+LIVE_FEED_QUALITY = 27  # Also quite low (just over a quarter) to satisfy Render's bad VM
 
 @app.on_event("startup")
 async def startup():
@@ -37,7 +38,7 @@ async def get_or_create_page(sid: str):
     lock = session_locks.setdefault(sid, asyncio.Lock())
     async with lock:
         if sid not in sessions:
-            page = await browser.new_page(viewport=ViewportSize(width=960, height=540))
+            page = await browser.new_page(viewport=ViewportSize(width=WIDTH, height=HEIGHT))
             await page.goto("https://www.google.com")
             await page.wait_for_load_state("networkidle")
             sessions[sid] = page
@@ -71,16 +72,16 @@ async def websocket_endpoint(ws: WebSocket):
                 await page.goto(url)
                 await page.wait_for_load_state("networkidle")
             elif data["type"] == "mousemove":
-                scaled_x = data["x"] * (960 / data["img_width"])
-                scaled_y = data["y"] * (540 / data["img_height"])
+                scaled_x = data["x"] * (WIDTH / data["img_width"])
+                scaled_y = data["y"] * (HEIGHT / data["img_height"])
                 await page.mouse.move(x=scaled_x, y=scaled_y)
             elif data["type"] == "click":
-                scaled_x = data["x"] * (960 / data["img_width"])
-                scaled_y = data["y"] * (540 / data["img_height"])
+                scaled_x = data["x"] * (WIDTH / data["img_width"])
+                scaled_y = data["y"] * (HEIGHT / data["img_height"])
                 await page.mouse.click(x=scaled_x, y=scaled_y)
             elif data["type"] == "rightClick":
-                scaled_x = data["x"] * (960 / data["img_width"])
-                scaled_y = data["y"] * (540 / data["img_height"])
+                scaled_x = data["x"] * (WIDTH / data["img_width"])
+                scaled_y = data["y"] * (HEIGHT / data["img_height"])
                 await page.mouse.click(x=scaled_x, y=scaled_y, button="right")
             elif data["type"] == "keypress":
                 await page.keyboard.press(data["key"])
