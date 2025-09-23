@@ -5,7 +5,7 @@ import asyncio
 import json
 import os
 
-os.system("playwright install --with-deps chromium")
+os.system("whoami")
 
 app = FastAPI()
 browser: Browser = None
