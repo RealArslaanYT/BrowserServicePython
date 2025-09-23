@@ -17,7 +17,14 @@ RUN useradd -m -u 1000 user
 
 ENV PLAYWRIGHT_BROWSERS_PATH=/.cache/ms-playwright
 
-# Install playwright
+RUN playwright install --with-deps
+
+ENV PLAYWRIGHT_BROWSERS_PATH=/home/user/.cache/ms-playwright
+
+RUN playwright install --with-deps
+
+ENV PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright
+
 RUN playwright install --with-deps
 
 # Switch to the "user" user
