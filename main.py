@@ -59,7 +59,7 @@ async def websocket_endpoint(ws: WebSocket):
         if data["type"] == "navigate":
             url = data["url"]
             if ":/" not in url:
-                url = "http://{url}"
+                url = f"http://{url}"
             await page.goto(url)
             await page.wait_for_load_state("networkidle")
         elif data["type"] == "mousemove":
