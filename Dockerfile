@@ -12,8 +12,8 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-# Install playwright + chromium
-RUN playwright install --with-deps chromium
+# Install playwright
+RUN playwright install --with-deps
 
 # Copy code
 COPY . .
