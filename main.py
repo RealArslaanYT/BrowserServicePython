@@ -10,7 +10,8 @@ browser: Browser = None
 sessions: dict[str, Page] = {}
 session_locks: dict[str, asyncio.Lock] = {}
 
-FPS = 30
+FPS = 15  # VERY LOW so Render doesn't commit die when tryna run this
+LIVE_FEED_QUALITY = 35  # Also quite low (less than half!) to satisfy Render's bad VM
 
 @app.on_event("startup")
 async def startup():
@@ -38,7 +39,7 @@ async def live_feed(request: Request):
 
     async def generate():
         while True:
-            buf = await page.screenshot(type="jpeg", quality=60)
+            buf = await page.screenshot(type="jpeg", quality=LIVE_FEED_QUALITY)
             yield (b"--frame\r\n"
                    b"Content-Type: image/jpeg\r\n\r\n" + buf + b"\r\n")
             await asyncio.sleep(1 / FPS)
