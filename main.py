@@ -23,7 +23,7 @@ async def get_or_create_page(sid: str):
     lock = session_locks.setdefault(sid, asyncio.Lock())
     async with lock:
         if sid not in sessions:
-            page = await browser.new_page(viewport=ViewportSize(width=1280, height=720))
+            page = await browser.new_page(viewport=ViewportSize(width=960, height=540))
             await page.goto("https://www.google.com")
             await page.wait_for_load_state("networkidle")
             sessions[sid] = page
@@ -39,9 +39,9 @@ async def live_feed(request: Request):
 
     async def generate():
         while True:
-            buf = await page.screenshot(type="jpeg", quality=LIVE_FEED_QUALITY)
+            buf = await page.screenshot(type="webp", quality=LIVE_FEED_QUALITY)
             yield (b"--frame\r\n"
-                   b"Content-Type: image/jpeg\r\n\r\n" + buf + b"\r\n")
+                   b"Content-Type: image/webp\r\n\r\n" + buf + b"\r\n")
             await asyncio.sleep(1 / FPS)
 
     return StreamingResponse(generate(), media_type="multipart/x-mixed-replace; boundary=frame")
@@ -78,6 +78,7 @@ async def websocket_endpoint(ws: WebSocket):
 
     await page.close()
     sessions.pop(sid, None)
+    session_locks.pop(sid, None)
 
 @app.get("/")
 def index():
