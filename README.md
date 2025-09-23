@@ -2,8 +2,8 @@
 title: BrowserServicePython
 emoji: 🖥️
 colorFrom: gray
-colorTo: black
-sdk: python
+colorTo: yellow
+sdk: docker
 sdk_version: "1.0"
 app_file: app.py
 pinned: false
