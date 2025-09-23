@@ -114,7 +114,7 @@ document.getElementById("goBtn").onclick = () => {
     socket.send(JSON.stringify({ type: "navigate", url }));
 };
 
-document.addEventListener("keydown", e => {
+urlBar.addEventListener("keydown", e => {
     if (e.key === "Enter") {
         const url = document.getElementById("urlBar").value;
         document.getElementById("urlBar").value = "";

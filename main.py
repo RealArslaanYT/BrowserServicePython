@@ -41,8 +41,13 @@ async def get_or_create_page(sid: str):
         if sid not in sessions:
             page = await browser.new_page(
                 viewport=ViewportSize(width=WIDTH, height=HEIGHT),
-                screen=ViewportSize(width=SCREEN_WIDTH, height=SCREEN_HEIGHT)
+                #screen=ViewportSize(width=SCREEN_WIDTH, height=SCREEN_HEIGHT),
             )
+            await page.add_init_script(script="""
+document.addEventListener('DOMContentLoaded', () => {
+  document.body.style.zoom = 0.67;
+});
+            """)
             await page.goto("https://www.google.com")
             await page.wait_for_load_state("networkidle")
             sessions[sid] = page
@@ -71,7 +76,7 @@ async def websocket_endpoint(ws: WebSocket):
             data = json.loads(message)
             if data["type"] == "navigate":
                 url = data["url"]
-                if ":/" not in url:
+                if ":" not in url:
                     url = f"http://{url}"
                 await page.goto(url)
                 await page.wait_for_load_state("networkidle")
