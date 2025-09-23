@@ -67,7 +67,6 @@ socket.onmessage = (event) => {
 socket.onclose = (event) => {
     img.removeAttribute("src");
     alert("WebSocket closed due to unknown error. Probably related to navigation or screenshot timeout, BrowserService is scuffed as shit.");
-    window.location.reload();
 }
 
 img.addEventListener("mousemove", e => {
