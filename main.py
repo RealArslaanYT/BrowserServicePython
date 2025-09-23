@@ -53,9 +53,9 @@ async def live_feed(request: Request):
 
     async def generate():
         while True:
-            buf = await page.screenshot(type="webp", quality=LIVE_FEED_QUALITY)
+            buf = await page.screenshot(type="jpeg", quality=LIVE_FEED_QUALITY)
             yield (b"--frame\r\n"
-                   b"Content-Type: image/webp\r\n\r\n" + buf + b"\r\n")
+                   b"Content-Type: image/jpeg\r\n\r\n" + buf + b"\r\n")
             await asyncio.sleep(1 / FPS)
 
     return StreamingResponse(generate(), media_type="multipart/x-mixed-replace; boundary=frame")
@@ -78,12 +78,12 @@ async def websocket_endpoint(ws: WebSocket):
             await page.goto(url)
             await page.wait_for_load_state("networkidle")
         elif data["type"] == "mousemove":
-            scaled_x = data["x"] * (1280 / data["img_width"])
-            scaled_y = data["y"] * (720 / data["img_height"])
+            scaled_x = data["x"] * (960 / data["img_width"])
+            scaled_y = data["y"] * (540 / data["img_height"])
             await page.mouse.move(scaled_x, scaled_y)
         elif data["type"] == "click":
-            scaled_x = data["x"] * (1280 / data["img_width"])
-            scaled_y = data["y"] * (720 / data["img_height"])
+            scaled_x = data["x"] * (960 / data["img_width"])
+            scaled_y = data["y"] * (540 / data["img_height"])
             await page.mouse.click(scaled_x, scaled_y)
         elif data["type"] == "keypress":
             await page.keyboard.press(data["key"])
