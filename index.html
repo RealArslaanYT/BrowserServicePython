@@ -58,7 +58,17 @@ const socket = new WebSocket(`${protocol}//${location.host}/ws?sid=${sid}`);
 
 const img = document.querySelector(".pageview");
 
-img.src = `/live?sid=${sid}`;
+socket.onmessage = (event) => {
+    if (typeof event.data !== "string") {
+        img.src = URL.createObjectURL(event.data);
+    }
+};
+
+socket.onclose = (event) => {
+    img.removeAttribute("src");
+    alert("WebSocket closed due to unknown error. Probably related to navigation or screenshot timeout, BrowserService is scuffed as shit.");
+    window.location.reload();
+}
 
 img.addEventListener("mousemove", e => {
     const rect = img.getBoundingClientRect();
@@ -72,6 +82,14 @@ img.addEventListener("click", e => {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     sendMouseClick(x, y);
+});
+
+img.addEventListener("contextmenu", e => {
+    e.preventDefault();
+    const rect = img.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    sendMouseRightClick(x, y);
 });
 
 document.addEventListener("keydown", e => {
@@ -126,6 +144,20 @@ function sendMouseClick(x, y) {
 
     socket.send(JSON.stringify({
         type: "click",
+        x: x,
+        y: y,
+        img_width: imgWidth,
+        img_height: imgHeight
+    }));
+}
+
+function sendMouseRightClick(x, y) {
+    const rect = img.getBoundingClientRect();
+    const imgWidth = rect.width;
+    const imgHeight = rect.height;
+
+    socket.send(JSON.stringify({
+        type: "rightClick",
         x: x,
         y: y,
         img_width: imgWidth,
