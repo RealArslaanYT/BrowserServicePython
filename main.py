@@ -10,6 +10,8 @@ browser: Browser = None
 sessions: dict[str, Page] = {}
 session_locks: dict[str, asyncio.Lock] = {}
 
+FPS = 30
+
 @app.on_event("startup")
 async def startup():
     global browser
@@ -39,7 +41,7 @@ async def live_feed(request: Request):
             buf = await page.screenshot()
             yield (b"--frame\r\n"
                    b"Content-Type: image/png\r\n\r\n" + buf + b"\r\n")
-            await asyncio.sleep(1 / 60)
+            await asyncio.sleep(1 / FPS)
 
     return StreamingResponse(generate(), media_type="multipart/x-mixed-replace; boundary=frame")
 
