@@ -11,6 +11,7 @@ sessions: dict[str, Page] = {}
 session_locks: dict[str, asyncio.Lock] = {}
 
 WIDTH, HEIGHT = (640, 360)
+SCREEN_WIDTH, SCREEN_HEIGHT = (1920, 1080)
 FPS = 10  # VERY LOW so Render doesn't commit die when tryna run this
 LIVE_FEED_QUALITY = 27  # Also quite low (just over a quarter) to satisfy Render's bad VM
 
@@ -38,7 +39,10 @@ async def get_or_create_page(sid: str):
     lock = session_locks.setdefault(sid, asyncio.Lock())
     async with lock:
         if sid not in sessions:
-            page = await browser.new_page(viewport=ViewportSize(width=WIDTH, height=HEIGHT))
+            page = await browser.new_page(
+                viewport=ViewportSize(width=WIDTH, height=HEIGHT),
+                screen=ViewportSize(width=SCREEN_WIDTH, height=SCREEN_HEIGHT)
+            )
             await page.goto("https://www.google.com")
             await page.wait_for_load_state("networkidle")
             sessions[sid] = page
