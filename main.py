@@ -3,7 +3,9 @@ from fastapi.responses import HTMLResponse
 from playwright.async_api import async_playwright, ViewportSize, Page, Browser
 import asyncio
 import json
-import uuid
+import os
+
+os.system("playwright install --with-deps chromium")
 
 app = FastAPI()
 browser: Browser = None
