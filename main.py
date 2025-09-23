@@ -15,6 +15,7 @@ SCREEN_WIDTH, SCREEN_HEIGHT = (1920, 1080)
 FPS = 10  # VERY LOW so Render doesn't commit die when tryna run this
 LIVE_FEED_QUALITY = 27  # Also quite low (just over a quarter) to satisfy Render's bad VM
 
+
 @app.on_event("startup")
 async def startup():
     global browser
