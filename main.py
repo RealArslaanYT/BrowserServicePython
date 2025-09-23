@@ -38,9 +38,9 @@ async def live_feed(request: Request):
 
     async def generate():
         while True:
-            buf = await page.screenshot()
+            buf = await page.screenshot(type="jpeg", quality=60)
             yield (b"--frame\r\n"
-                   b"Content-Type: image/png\r\n\r\n" + buf + b"\r\n")
+                   b"Content-Type: image/jpeg\r\n\r\n" + buf + b"\r\n")
             await asyncio.sleep(1 / FPS)
 
     return StreamingResponse(generate(), media_type="multipart/x-mixed-replace; boundary=frame")
