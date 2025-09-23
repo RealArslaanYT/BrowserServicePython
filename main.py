@@ -17,7 +17,21 @@ LIVE_FEED_QUALITY = 35  # Also quite low (less than half!) to satisfy Render's b
 async def startup():
     global browser
     playwright = await async_playwright().start()
-    browser = await playwright.chromium.launch(headless=True, chromium_sandbox=False)
+    browser = await playwright.chromium.launch(
+        headless=True,
+        chromium_sandbox=False,
+        args=[
+            "--disable-gpu",
+            "--no-sandbox",
+            "--disable-dev-shm-usage",
+            "--disable-background-timer-throttling",
+            "--disable-renderer-backgrounding",
+            "--disable-extensions",
+            "--disable-infobars",
+            "--disable-accelerated-2d-canvas",
+            "--disable-software-rasterizer"
+        ]
+    )
 
 async def get_or_create_page(sid: str):
     lock = session_locks.setdefault(sid, asyncio.Lock())
